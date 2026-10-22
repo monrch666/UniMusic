@@ -13,7 +13,7 @@ export function selectAutoCacheTrack(track: Track, enabled: boolean, vkUserId?: 
 }
 
 export const defaultPreferences = (directory: string): AppPreferences => ({
-  preferDownloads: true, autoCache: true, legacyAudio: true, closeToTray: false, mediaShortcuts: false,
+  autoUpdates: true, preferDownloads: true, autoCache: true, legacyAudio: true, closeToTray: false, mediaShortcuts: false,
   broadcast: false, listeningEvents: false, downloadDirectory: directory,
   shortcuts: { toggle: "CommandOrControl+Alt+Space", next: "CommandOrControl+Alt+Right", previous: "CommandOrControl+Alt+Left" },
   proxyMode: "system", proxyAddress: "", equalizer: [0, 0, 0, 0, 0],
@@ -21,7 +21,7 @@ export const defaultPreferences = (directory: string): AppPreferences => ({
 
 export function validatePreferences(value: unknown, previous: AppPreferences): AppPreferences {
   const v = object(value); const result = { ...previous };
-  for (const name of ["preferDownloads", "autoCache", "legacyAudio", "closeToTray", "mediaShortcuts", "broadcast", "listeningEvents"] as const)
+  for (const name of ["autoUpdates", "preferDownloads", "autoCache", "legacyAudio", "closeToTray", "mediaShortcuts", "broadcast", "listeningEvents"] as const)
     if (name in v) {
       if (typeof v[name] !== "boolean") throw new VkError("Некорректная настройка.");
       result[name] = v[name];

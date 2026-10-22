@@ -4,6 +4,7 @@ import type { MusicApi, Profile, YandexAccount as Account } from "./shared";
 import { Cover, Icon } from "./ui";
 import AdvancedSettings from "./AdvancedSettings";
 import YandexAccount from "./YandexAccount";
+import UpdateSettings from "./UpdateSettings";
 
 export type SettingsSection = "unimusic" | "yandex" | "vk";
 
@@ -30,6 +31,7 @@ export default function SettingsPage({ section, onSection, children, api, profil
         <button className="button secondary" disabled={!api} onClick={profile ? onLogout : onLogin}>{profile ? "Отключить VK" : "Подключить VK"}</button>
       </section>}
       <AdvancedSettings section={section} api={api} onError={onError} onEqualizer={onEqualizer} />
+      {section === "unimusic" && <UpdateSettings api={api} />}
     </div>
   </section>;
 }

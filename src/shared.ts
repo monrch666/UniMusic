@@ -1,4 +1,11 @@
 export type MusicSource = "vk" | "yandex";
+export interface UpdateState {
+  status: "idle" | "checking" | "downloading" | "ready" | "current" | "error" | "disabled";
+  currentVersion: string;
+  version?: string;
+  progress?: number;
+  error?: string;
+}
 export interface UnifiedPlaylist { id: string; title: string; tracks: Track[] }
 export type UnifiedAction = { type: "list" } | { type: "create"; title: string; tracks?: Track[] } | { type: "rename"; id: string; title: string } | { type: "delete"; id: string } | { type: "add" | "remove"; id: string; tracks: Track[] };
 export interface YandexAccount extends Profile { plus: boolean }
@@ -102,6 +109,7 @@ export interface PlaybackSnapshot {
   total: number;
 }
 export interface AppPreferences {
+  autoUpdates: boolean;
   preferDownloads: boolean;
   autoCache: boolean;
   legacyAudio: boolean;
@@ -162,6 +170,8 @@ export type AuthAction =
   | { type: "cancel" };
 
 export interface MusicApi {
+  updates(action: "status" | "check"): Promise<Result<UpdateState>>;
+  onUpdate(callback: (state: UpdateState) => void): () => void;
   unified(action: UnifiedAction): Promise<Result<UnifiedPlaylist[]>>;
   waveFeedback(track: Track, type: "trackStarted" | "trackFinished" | "skip", seconds: number): Promise<Result<null>>;
   yandexSession(): Promise<Result<YandexAccount | null>>;

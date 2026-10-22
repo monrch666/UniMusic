@@ -10,6 +10,14 @@
 .settings-sections button:hover { color: var(--text); }
 .settings-sections button[aria-current="page"] { color: var(--text); border-color: var(--accent); }
 .settings-section, .visual-settings { display: grid; gap: 24px; }
+.update-settings .settings-card-heading { margin-bottom: 4px; }
+.update-settings .settings-card-heading p { margin-bottom: 0; }
+.update-settings .setting-row { border-bottom: 0; }
+.update-settings .button { min-height: 44px; flex-shrink: 0; }
+.update-settings .update-status { margin: 4px 0 0; color: var(--muted); }
+.update-settings progress { display: block; width: 100%; height: 5px; margin-top: 16px; border: 0; border-radius: 4px; overflow: hidden; accent-color: var(--accent); }
+.update-settings progress::-webkit-progress-bar { background: var(--line); }
+.update-settings progress::-webkit-progress-value { background: var(--accent); }
 .settings-preference-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
 .settings-card { min-width: 0; padding: 28px; border: 1px solid #ffffff12; border-radius: 12px; background: #ffffff03; }
 .settings-card h2 { margin: 0; color: var(--text); font-size: 20px; font-weight: 500; letter-spacing: -.3px; }

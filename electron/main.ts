@@ -1,4 +1,7 @@
 import { UnifiedStore } from "./unified";
+import { AppUpdates } from "./updates";
+import electronUpdater from "electron-updater";
+import { spawn } from "node:child_process";
 import { YandexMusic } from "./yandex";
 import {
   app,
@@ -58,6 +61,20 @@ let yandex: YandexMusic;
 let yandexToken: string | null = null;
 let tray: Tray | null = null;
 let quitting = false;
+let updates: AppUpdates;
+let updateHelperStarted = false;
+const updatesSupported = app.isPackaged && process.platform === "win32" && !process.env.UNIMUSIC_TEST_USER_DATA;
+async function launchPortableUpdate(restart = false): Promise<boolean> {
+  if (updateHelperStarted || !updates.hasPendingPortable) return false;
+  const powershell = join(process.env.SystemRoot || "C:\\Windows", "System32", "WindowsPowerShell", "v1.0", "powershell.exe");
+  const child = spawn(powershell, ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", updates.helper,
+    "-Manifest", updates.manifest, "-ParentProcessId", String(process.pid), "-PortableFile", process.env.PORTABLE_EXECUTABLE_FILE!, ...(restart ? ["-Restart"] : [])],
+  { detached: true, windowsHide: true, stdio: "ignore" });
+  return new Promise(resolve => {
+    child.once("error", () => resolve(false));
+    child.once("spawn", () => { updateHelperStarted = true; child.unref(); resolve(true); });
+  });
+}
 let savedTracks: Record<string, Track | null> = {};
 const prepared = new Map<string, { track: Track; expires: number }>();
 const preparedKey = (track: Track) => `${credential?.userId ?? 0}:${track.localId ?? `${track.source === "yandex" ? "yandex:" : ""}${track.ownerId}_${track.id}`}`;
@@ -276,6 +293,12 @@ function registerIpc(): void {
       return protect(() => action(...args));
     });
   };
+  handle("music:updates", async action => {
+    if (action === "status") return updates.state;
+    if (action !== "check") throw new VkError("Неизвестное действие обновления.");
+    void updates.check();
+    return updates.state;
+  });
   handle("music:yandexSession", async () => yandexToken ? yandex.profile() : null);
   handle("music:yandexAuth", async action => {
     if (!["begin", "poll", "cancel", "open", "logout"].includes(String(action))) throw new VkError("Неизвестное действие входа.");
@@ -363,6 +386,7 @@ function registerIpc(): void {
       try {
         await applyPreferences();
         await preferenceFile.write(preferences);
+        await updates.setEnabled(Boolean(updatesSupported && preferences.autoUpdates));
       }
       catch (error) { preferences = previous; await applyPreferences(); throw error; }
     }
@@ -512,6 +536,15 @@ void app.whenReady().then(async () => {
   const saved = await preferenceFile.read(defaults);
   try { preferences = validatePreferences(saved, { ...defaults, downloadDirectory: typeof saved.downloadDirectory === "string" ? saved.downloadDirectory : defaults.downloadDirectory }); }
   catch { preferences = defaults; }
+  const portablePath = process.env.PORTABLE_EXECUTABLE_FILE;
+  updates = new AppUpdates({
+    version: app.getVersion(), directory: join(app.getPath("userData"), "updates", "portable"),
+    arch: process.arch, enabled: Boolean(updatesSupported && preferences.autoUpdates), portablePath,
+    installed: updatesSupported && !portablePath ? electronUpdater.autoUpdater : undefined,
+    fetcher: (input, init) => net.fetch(input instanceof URL ? input.href : input, init),
+    onChange: state => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send("music:update-state", state); },
+  });
+  if (await updates.resumePortable() && await launchPortableUpdate(true)) { app.quit(); return; }
   offline = new OfflineStore(app.getPath("userData"), media, () => preferences.downloadDirectory, track => resolveAudio(track, false, false), async track => {
     const cover = await yandex.artwork(track.id); return cover ? media.register(cover) : undefined;
   });
@@ -541,9 +574,14 @@ void app.whenReady().then(async () => {
   auth = new DirectAuth(transport, deviceId, saveCredential);
   registerIpc();
   createWindow();
+  mainWindow!.webContents.once("did-finish-load", () => { void updates.check(); });
 });
 app.on("window-all-closed", () => {
   auth?.reset();
   app.quit();
 });
-app.on("before-quit", () => { quitting = true; globalShortcut.unregisterAll(); });
+app.on("before-quit", () => {
+  quitting = true; globalShortcut.unregisterAll();
+  if (updates?.hasPendingPortable) void launchPortableUpdate();
+  updates?.stop();
+});

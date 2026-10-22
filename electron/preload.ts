@@ -2,6 +2,12 @@ import { contextBridge, ipcRenderer } from "electron";
 import type { MusicApi } from "../src/shared";
 
 const api: MusicApi = {
+  updates: action => ipcRenderer.invoke("music:updates", action),
+  onUpdate: callback => {
+    const listener = (_event: Electron.IpcRendererEvent, state: import("../src/shared").UpdateState) => callback(state);
+    ipcRenderer.on("music:update-state", listener);
+    return () => ipcRenderer.removeListener("music:update-state", listener);
+  },
   unified: action => ipcRenderer.invoke("music:unified", action),
   waveFeedback: (track, type, seconds) => ipcRenderer.invoke("music:waveFeedback", track, type, seconds),
   yandexSession: () => ipcRenderer.invoke("music:yandexSession"),
