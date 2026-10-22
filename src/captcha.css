@@ -1,0 +1,78 @@
+:root {
+  font-family: "Segoe UI", system-ui, sans-serif;
+  color: #ede5f7;
+  background: #17131e;
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+main {
+  padding: 35px 30px;
+  max-width: 480px;
+  margin: auto;
+}
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #bd9ce8;
+}
+h1 {
+  font-size: 24px;
+  font-weight: 500;
+}
+p {
+  color: #bfb0ce;
+  font-size: 13px;
+  line-height: 1.8;
+}
+img {
+  display: block;
+  max-width: 100%;
+  min-height: 65px;
+  margin: 25px auto;
+  border-radius: 8px;
+  background: #fff;
+}
+form {
+  display: grid;
+  gap: 11px;
+  margin-top: 22px;
+}
+label {
+  color: #c5b5d4;
+  font-size: 12px;
+}
+input,
+button {
+  font: inherit;
+  padding: 12px;
+  border-radius: 8px;
+}
+input {
+  border: 1px solid #80708f;
+  background: #110e17;
+  color: #eee5f7;
+}
+button {
+  cursor: pointer;
+  border: 0;
+  color: #cdbada;
+  background: transparent;
+  width: 100%;
+}
+.primary {
+  background: #c2a4ef;
+  color: #291d37;
+  margin-top: 6px;
+}
+:focus-visible {
+  outline: 2px solid #ccb3ef;
+  outline-offset: 3px;
+}
+#captcha-error {
+  color: #efb6c6;
+}

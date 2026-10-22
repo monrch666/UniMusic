@@ -1,0 +1,83 @@
+{
+  "name": "unimusic",
+  "version": "0.7.6",
+  "description": "Музыкальное приложение для Windows с VK и Яндекс Музыкой",
+  "private": true,
+  "type": "module",
+  "main": "out/main/main.js",
+  "author": "UniMusic",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "electron-vite dev",
+    "start": "electron-vite preview",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run typecheck && electron-vite build",
+    "test": "tsx --test tests/*.test.ts",
+    "test:app": "npm run build && node scripts/smoke.mjs",
+    "test:dev": "npm run build && node scripts/smoke.mjs --dev",
+    "dist": "npm run build && electron-builder --win nsis portable",
+    "test:features": "npm run build && node scripts/features.mjs"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.3.0",
+    "hls.js": "^1.6.16",
+    "lucide": "^0.577.0",
+    "morphicons": "^2.0.0",
+    "music-metadata": "^12.2.3",
+    "qrcode": "^1.5.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "thinking-orbs": "^0.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "latest",
+    "electron": "^44.9.0",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^6.0.0",
+    "playwright": "^1.56.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vite": "^8.3.4"
+  },
+  "build": {
+    "appId": "app.unimusic.desktop",
+    "productName": "UniMusic",
+    "directories": {
+      "output": "release/0.7.6"
+    },
+    "files": [
+      "out/**/*",
+      "package.json",
+      "THIRD_PARTY_NOTICES.txt",
+      "assets/**/*"
+    ],
+    "asar": true,
+    "win": {
+      "icon": "assets/unimusic.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "installerIcon": "assets/unimusic.ico",
+      "uninstallerIcon": "assets/unimusic.ico",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "${productName}-Setup-${version}-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-Portable-${version}-${arch}.${ext}"
+    },
+    "npmRebuild": false,
+    "asarUnpack": [
+      "node_modules/ffmpeg-static/**"
+    ]
+  }
+}

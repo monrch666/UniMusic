@@ -1,0 +1,23 @@
+node_modules/
+out/
+release/
+test-results/
+*.log
+.env
+.env.*
+!.env.example
+*.token
+session.enc
+*.enc
+*.enc.*
+playback-diagnostics.json
+preferences.json
+offline.json
+unimusic-playlists.json
+device-id
+Local State
+Cookies
+Cookies-journal
+Cache/
+Code Cache/
+GPUCache/

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src https:; connect-src 'self' ws://127.0.0.1:*; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Проверка VK</title>
+  </head>
+  <body class="captcha-page">
+    <main>
+      <p class="eyebrow">VK ID</p>
+      <h1>Проверка безопасности</h1>
+      <p>
+        Введите символы с картинки. После проверки вход продолжится
+        автоматически.
+      </p>
+      <img id="captcha-image" alt="Картинка с кодом проверки VK" />
+      <p id="captcha-error" role="alert" hidden>
+        Не удалось загрузить картинку. Закройте проверку и повторите попытку.
+      </p>
+      <form id="captcha-form">
+        <label for="captcha-key">Символы с картинки</label>
+        <input
+          id="captcha-key"
+          name="captcha-key"
+          autocomplete="off"
+          spellcheck="false"
+          maxlength="256"
+          required
+          autofocus
+        />
+        <button class="primary" type="submit">Продолжить вход</button>
+      </form>
+      <button id="captcha-cancel" type="button">Отмена</button>
+    </main>
+    <script type="module" src="/src/captcha.ts"></script>
+  </body>
+</html>
